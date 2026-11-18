@@ -1,0 +1,37 @@
+
+name: Build HideVault APK
+
+on:
+  workflow_dispatch:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Extract project
+        run: unzip -q HideVault.zip -d source
+
+      - name: Build APK
+        run: gradle -p source/HideVault assembleDebug --no-daemon
+
+      - name: Save APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: HideVault-APK
+          path: source/HideVault/app/build/outputs/apk/debug/app-debug.apk
+          
